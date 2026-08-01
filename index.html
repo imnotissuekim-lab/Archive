@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Design Archive - Index (Active Filters)</title>
+    <title>Design Archive - Index</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     
@@ -66,9 +66,7 @@
         }
         .search-box input:focus { width: 200px; border-color: var(--text-main); }
 
-        /* =========================================
-           필터 영역
-           ========================================= */
+        /* 필터 영역 */
         .filter-section {
             margin-bottom: 40px;
         }
@@ -78,7 +76,6 @@
         .filter-item { cursor: pointer; transition: color 0.2s; }
         .filter-item:hover, .filter-item.active { color: var(--text-main); }
 
-        /* 내가 선택한 필터(Active Filters) 영역 */
         .active-filters-area {
             display: flex; gap: 10px; flex-wrap: wrap; 
             min-height: 30px;
@@ -112,9 +109,7 @@
             color: var(--text-main); border-color: var(--text-main); background-color: transparent;
         }
 
-        /* =========================================
-           Index View (카드 뷰)
-           ========================================= */
+        /* Index View (카드 뷰) */
         #indexView { display: block; flex: 1; }
         
         .archive-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px 20px; }
@@ -144,7 +139,7 @@
         .action-btn { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main); padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 2px; text-transform: uppercase;}
         .action-btn:hover { color: var(--bg-color); background: var(--text-main); border-color: var(--text-main);}
 
-        /* --- Detail View --- */
+        /* Detail View */
         #detailView { display: none; flex: 1; max-width: 1000px; width: 100%; margin: 0 auto; padding-bottom: 60px; }
         .detail-top-bar { display: flex; justify-content: space-between; margin-bottom: 60px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; text-transform: uppercase; font-size: 13px;}
         .back-link { cursor: pointer; color: var(--text-muted); transition: 0.2s; }
@@ -160,7 +155,7 @@
         .blog-content img { max-width: 100%; margin: 40px 0; display: block; }
         .blog-content a { color: var(--text-main); text-decoration: underline; }
 
-        /* --- Modal --- */
+        /* Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--overlay-bg); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px);}
         .modal-content { background: var(--modal-bg); padding: 40px; width: 100%; max-width: 900px; max-height: 95vh; overflow-y: auto; color: var(--modal-text); border: 1px solid var(--border-color); box-shadow: 0 20px 40px rgba(0,0,0,0.2);}
         .modal-content.small { max-width: 600px; }
@@ -176,26 +171,14 @@
         }
         .form-group input:focus, .form-group select:focus { border-color: var(--modal-text); }
         
-        /* 자동추천 버튼 스타일 */
         .btn-recommend {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--modal-text);
-            padding: 0 16px;
-            height: 40px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            transition: all 0.2s;
+            background: transparent; border: 1px solid var(--border-color); color: var(--modal-text);
+            padding: 0 16px; height: 40px; cursor: pointer; font-family: 'Inter', sans-serif;
+            font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+            white-space: nowrap; transition: all 0.2s;
         }
         .btn-recommend:hover {
-            background: var(--modal-text);
-            color: var(--bg-color);
-            border-color: var(--modal-text);
+            background: var(--modal-text); color: var(--bg-color); border-color: var(--modal-text);
         }
 
         .editor-wrapper { position: relative; margin-bottom: 20px; }
@@ -237,9 +220,7 @@
         .ql-editor img { cursor: pointer; transition: outline 0.1s; }
         .ql-editor img.active-resize { outline: 2px solid var(--modal-text); }
 
-        /* =========================================
-           [반응형 (Mobile & Tablet) 스타일]
-           ========================================= */
+        /* 반응형 */
         @media (max-width: 1024px) {
             body { padding: 30px 40px; }
             .archive-grid { grid-template-columns: repeat(2, 1fr); gap: 30px 20px; }
@@ -248,30 +229,19 @@
 
         @media (max-width: 600px) {
             body { padding: 20px 16px; }
-            
             .header-top { margin-bottom: 30px; }
             .logo-area h1 { font-size: 26px; }
-            
-            /* 검색창 모바일 너비 확장 */
             .search-box input { width: 120px; }
             .search-box input:focus { width: 150px; }
-            
-            /* 카드 1열 배치 및 모바일에서 액션 버튼 항상 표시 */
             .archive-grid { grid-template-columns: 1fr; gap: 24px; }
             .card .card-actions { opacity: 1; }
-            
-            /* 필터 세로 간격 및 레이아웃 조정 */
             .directory-filters { gap: 24px; }
             .filter-group { flex: 1; min-width: 100px; }
-            
-            /* 모달 창 안쪽 여백 및 입력란 1열 배치 */
             .modal-content { padding: 24px 16px; }
             .form-row { flex-direction: column; align-items: stretch; gap: 12px; }
             .form-group { min-width: 100%; margin-bottom: 12px; }
             .btn-recommend { width: 100%; margin-top: 4px; }
             #editor-container { height: 280px; }
-            
-            /* 디테일 페이지 반응형 */
             .blog-title { font-size: 32px; margin-bottom: 24px; letter-spacing: -1px; }
             .detail-info { grid-template-columns: 1fr; gap: 16px; margin-bottom: 36px; }
         }
@@ -288,9 +258,7 @@
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="Search" oninput="handleSearch()">
             </div>
-            <!-- 테마 전환 버튼 (텍스트 변경) -->
             <span onclick="toggleTheme()" id="themeBtn" title="Toggle Theme" style="margin-right: 10px;">DARK</span>
-            
             <span onclick="openManageModal()">Settings</span>
             <span onclick="openModal()">+ Add</span>
         </div>
@@ -313,22 +281,18 @@
             </div>
         </div>
 
-        <!-- 선택된 필터 표시 (Active Filters) 영역 -->
-        <div class="active-filters-area" id="activeFiltersArea">
-            <!-- 자바스크립트로 선택한 태그들이 렌더링됨 -->
-        </div>
+        <div class="active-filters-area" id="activeFiltersArea"></div>
     </div>
 
-    <!-- =====================================
-         Index View (기본 - 카드 그리드)
-         ===================================== -->
+    <!-- Index View -->
     <div id="indexView">
         <div class="archive-grid" id="indexGrid"></div>
     </div>
 
-    <!-- 디테일 뷰 -->
+    <!-- Detail View -->
     <div id="detailView">
         <div class="detail-top-bar">
+            <!-- 온페이지 뒤로 가기 링크 -->
             <span class="back-link" onclick="restoreView()">← Back</span>
             <div class="detail-actions">
                 <span id="detailPinBtn">Pin</span>
@@ -407,7 +371,7 @@
         </div>
     </div>
 
-    <!-- 설정 (관리/백업) 모달 -->
+    <!-- 설정 모달 -->
     <div class="modal-overlay" id="manageModal">
         <div class="modal-content small">
             <h3>Settings</h3>
@@ -439,9 +403,7 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
     <script>
-        // ----------------------------------------------------
-        // [테마 전환 로직 (다크 / 라이트 모드)]
-        // ----------------------------------------------------
+        // 테마 설정
         const savedTheme = localStorage.getItem('designArchiveTheme') || 'light';
         if (savedTheme === 'dark') {
             document.body.classList.add('dark-mode');
@@ -455,18 +417,35 @@
             document.getElementById('themeBtn').innerText = isDark ? 'LIGHT' : 'DARK';
         }
 
-        // ----------------------------------------------------
-        // [뷰 복귀 로직]
-        // ----------------------------------------------------
-        function restoreView() {
+        // ==========================================
+        // [수정됨] 뷰 복귀 & History API 연동
+        // ==========================================
+        function restoreView(fromHistory = false) {
             document.getElementById('detailView').style.display = 'none';
             document.getElementById('filterSection').style.display = 'block';
             document.getElementById('indexView').style.display = 'block';
+            
+            // 사이트 내 ← Back 버튼을 클릭했을 때 사파리/크롬 방문 기록도 함께 1단계 뒤로 이동
+            if (!fromHistory && location.hash.startsWith('#post-')) {
+                history.back();
+            }
         }
 
-        // ----------------------------------------------------
-        // [에디터 초기화]
-        // ----------------------------------------------------
+        // ==========================================
+        // [추가됨] 브라우저 뒤로 가기 / 앞으로 가기 감지
+        // ==========================================
+        window.addEventListener('popstate', () => {
+            if (location.hash.startsWith('#post-')) {
+                const id = Number(location.hash.replace('#post-', ''));
+                if (id) {
+                    showDetail(id, true);
+                    return;
+                }
+            }
+            restoreView(true);
+        });
+
+        // 에디터 초기화
         var AlignStyle = Quill.import('attributors/style/align'); Quill.register(AlignStyle, true);
         var BaseImage = Quill.import('formats/image');
         class StyledImage extends BaseImage { static formats(domNode) { return { width: domNode.style.width, height: domNode.style.height }; } format(name, value) { if (name === 'width' || name === 'height') { if (value) this.domNode.style[name] = value; else this.domNode.style[name] = ''; } else super.format(name, value); } }
@@ -493,7 +472,6 @@
         }
         quill.on('text-change', updateThumbnailPicker);
 
-        // 리사이즈 로직
         const resizeUI = document.getElementById('resizeUI'); const imgW = document.getElementById('imgWidth'); const imgH = document.getElementById('imgHeight'); const dragBtn = document.getElementById('dragHandle');
         let activeImage = null;
         quill.root.addEventListener('click', (e) => {
@@ -526,9 +504,6 @@
             if(count>0) alert(`${count}개 항목이 자동 추천되었습니다.`); else alert(`추천할 수 있는 일치 항목이 없습니다.`);
         }
 
-        // ----------------------------------------------------
-        // [데이터 연동 및 다중 선택 렌더링 로직]
-        // ----------------------------------------------------
         let masterCategories = JSON.parse(localStorage.getItem('designArchiveMultiCats')) || ["3D", "Books & Publication", "Fashion", "Music", "Resource", "Web Design & Development"];
         let masterPlatforms = JSON.parse(localStorage.getItem('designArchiveMultiPlats')) || ["Photoshop", "Illustrator", "AI", "Wed", "Reference"];
         let masterMoods = JSON.parse(localStorage.getItem('designArchiveMultiMoods')) || ["귀여운", "심플한", "시크"];
@@ -553,7 +528,6 @@
         }
         function updateDetailPinBtn(isPinned) { document.getElementById('detailPinBtn').innerText = isPinned ? 'Unpin' : 'Pin'; }
 
-        // --- 필터 및 액티브 태그 렌더링 ---
         function renderFiltersUI() {
             const catDiv = document.getElementById('categoryFilterList'); catDiv.innerHTML = '';
             masterCategories.forEach(cat => {
@@ -625,7 +599,6 @@
 
         function resetFilters() { activeCategories = []; activePlatforms = []; activeMoods = []; document.getElementById('searchInput').value=''; searchQuery=""; renderFiltersUI(); renderCards(); }
         
-        // --- 카드 렌더링 ---
         function renderCards() {
             const indexGrid = document.getElementById('indexGrid');
             indexGrid.innerHTML = '';
@@ -679,8 +652,17 @@
             localStorage.setItem('designArchiveAgencyV5', JSON.stringify(posts));
         }
 
-        function showDetail(id) {
+        // ==========================================
+        // [수정됨] 상세 페이지 이동 시 브라우저 History 주입
+        // ==========================================
+        function showDetail(id, fromHistory = false) {
             currentDetailId = id; const post = posts.find(p => p.id === id); if(!post) return;
+            
+            // 브라우저 주소창 및 방문 기록에 해시 추가 (사파리 뒤로 가기 활성화)
+            if (!fromHistory) {
+                history.pushState({ id: id }, '', `#post-${id}`);
+            }
+
             document.getElementById('detailTitle').innerText = post.title;
             updateDetailPinBtn(post.pinned);
             
@@ -699,7 +681,6 @@
             window.scrollTo(0, 0);
         }
 
-        // --- 관리자 모달 ---
         function openManageModal() { document.getElementById('manageModal').style.display = 'flex'; renderManageLists(); }
         function closeManageModal() { document.getElementById('manageModal').style.display = 'none'; }
         function renderManageLists() {
@@ -724,7 +705,6 @@
         function exportData() { const dataToExport = { categories: masterCategories, platforms: masterPlatforms, moods: masterMoods, posts: posts }; const jsonStr = JSON.stringify(dataToExport, null, 2); const blob = new Blob([jsonStr], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `archive_backup_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); }
         function importData(event) { const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const imp = JSON.parse(e.target.result); if(imp.posts && imp.categories) { if(confirm('Overwrite existing data?')) { masterCategories = imp.categories; masterPlatforms = imp.platforms || []; masterMoods = imp.moods || []; posts = imp.posts; saveData(); closeManageModal(); alert('Import complete.'); } } else alert('Invalid file.'); } catch(err) { alert('Error reading file.'); } event.target.value = ''; }; reader.readAsText(file); }
 
-        // --- 글쓰기/수정 모달 ---
         const modal = document.getElementById('postModal'); const form = document.getElementById('postForm');
         function openModal(id = null) {
             modal.style.display = 'flex';
@@ -764,6 +744,12 @@
         // 초기 실행
         renderFiltersUI(); 
         renderCards();
+
+        // 페이지 진입 또는 새로고침 시 주소창 해시(#post-ID)가 있으면 자동으로 디테일 페이지 렌더링
+        if (location.hash.startsWith('#post-')) {
+            const id = Number(location.hash.replace('#post-', ''));
+            if (id) showDetail(id, true);
+        }
     </script>
 </body>
 </html>
