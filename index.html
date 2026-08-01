@@ -131,20 +131,14 @@
         .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; opacity: 0; transition: opacity 0.2s; }
         .card:hover .card-actions { opacity: 1; }
         
-        .pin-badge { 
+        .pin-icon { 
             position: absolute; top: 10px; left: 10px; 
-            font-size: 10px; font-weight: 600; letter-spacing: 0.5px;
-            padding: 4px 8px; border-radius: 2px; cursor: pointer; 
-            z-index: 10; transition: all 0.2s;
-            background: var(--bg-color); color: var(--text-muted);
-            border: 1px solid var(--border-color);
-            text-transform: uppercase;
+            font-size: 18px; cursor: pointer; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+            z-index: 10; transition: transform 0.2s; 
+            color: #ffffff;
         }
-        .pin-badge.pinned {
-            background: var(--text-main); color: var(--bg-color);
-            border-color: var(--text-main);
-        }
-        .pin-badge:hover { opacity: 0.8; }
+        .pin-icon:hover { transform: scale(1.2); }
         
         .action-btn { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main); padding: 4px 8px; font-size: 11px; cursor: pointer; border-radius: 2px; text-transform: uppercase;}
         .action-btn:hover { color: var(--bg-color); background: var(--text-main); border-color: var(--text-main);}
@@ -623,6 +617,7 @@
                 const cats = (post.category||[]).join(', ');
                 const tagsAndMoods = [...(post.tags||[]), ...(post.moods||[])].join(', ');
                 const bg = post.thumbnail ? post.thumbnail : '';
+                const pinMark = post.pinned ? '★' : '☆';
                 
                 const card = document.createElement('div');
                 card.className = 'card';
@@ -630,9 +625,7 @@
                 
                 card.innerHTML = `
                     <div class="card-image" style="background-image: url('${bg}')">
-                        <div class="pin-badge ${post.pinned ? 'pinned' : ''}" onclick="togglePin(${post.id}, event)">
-                            ${post.pinned ? 'PINNED' : 'PIN'}
-                        </div>
+                        <div class="pin-icon" onclick="togglePin(${post.id}, event)" title="Pin">${pinMark}</div>
                         <div class="card-actions">
                             <button class="action-btn" onclick="event.stopPropagation(); openModal(${post.id})">Edit</button>
                             <button class="action-btn" onclick="event.stopPropagation(); deletePost(${post.id})">Del</button>
