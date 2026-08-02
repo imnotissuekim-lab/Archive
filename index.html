@@ -390,19 +390,22 @@
                 <div class="manage-list" id="manageMoodList"></div>
                 <div class="add-input-group"><input type="text" id="newMoodInput"><button type="button" onclick="addMood()">Add</button></div>
             </div>
-            <div class="manage-section" style="border-top: 1px solid var(--border-color); padding-top: 20px; display:flex; gap:10px;">
-                <button type="button" class="btn-modal-cancel" onclick="exportData()">Export JSON</button>
-                <button type="button" class="btn-modal-save" onclick="document.getElementById('importFile').click()">Import Data</button>
-                <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-            </div>
             <div class="modal-actions"><button type="button" class="btn-modal-save" onclick="closeManageModal()">Close</button></div>
         </div>
     </div>
 
-    <!-- Quill Editor JS -->
+    <!-- Quill Editor & Supabase JS -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
+        // ==========================================
+        // 1. Supabase 연동 설정
+        // ==========================================
+        const SUPABASE_URL = 'https://swpyyaeulylfmqlddlol.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_lhAVf1zZv0VT80RpVtEc3Q_UBF_ndjH';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         // 테마 설정
         const savedTheme = localStorage.getItem('designArchiveTheme') || 'light';
         if (savedTheme === 'dark') {
@@ -418,22 +421,18 @@
         }
 
         // ==========================================
-        // [수정됨] 뷰 복귀 & History API 연동
+        // 2. 뷰 복귀 & History API 연동
         // ==========================================
         function restoreView(fromHistory = false) {
             document.getElementById('detailView').style.display = 'none';
             document.getElementById('filterSection').style.display = 'block';
             document.getElementById('indexView').style.display = 'block';
             
-            // 사이트 내 ← Back 버튼을 클릭했을 때 사파리/크롬 방문 기록도 함께 1단계 뒤로 이동
             if (!fromHistory && location.hash.startsWith('#post-')) {
                 history.back();
             }
         }
 
-        // ==========================================
-        // [추가됨] 브라우저 뒤로 가기 / 앞으로 가기 감지
-        // ==========================================
         window.addEventListener('popstate', () => {
             if (location.hash.startsWith('#post-')) {
                 const id = Number(location.hash.replace('#post-', ''));
@@ -508,24 +507,72 @@
         let masterPlatforms = JSON.parse(localStorage.getItem('designArchiveMultiPlats')) || ["Photoshop", "Illustrator", "AI", "Wed", "Reference"];
         let masterMoods = JSON.parse(localStorage.getItem('designArchiveMultiMoods')) || ["귀여운", "심플한", "시크"];
         
-        const initialData = [
-            { id: Date.now(), title: "ROUGHTYPE S/S Visual", category: ["Fashion"], thumbnail: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&q=80&w=800", tags: ["Art Direction", "Photography"], moods: ["시크"], content: "<p>테스트 콘텐츠</p>", pinned: false },
-            { id: Date.now()-1000, title: "Bloomtide Brand Identity", category: ["Cosmetics", "3D"], thumbnail: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800", tags: ["Creative Direction", "3D"], moods: ["심플한"], content: "<p>테스트 콘텐츠 2</p>", pinned: false }
-        ];
-
-        let posts = JSON.parse(localStorage.getItem('designArchiveAgencyV5')) || initialData;
-        
+        let posts = [];
         let activeCategories = [];
         let activePlatforms = [];
         let activeMoods = [];
         let currentDetailId = null, selectedThumbnail = "", searchQuery = "";
 
+        // ==========================================
+        // 3. Supabase 데이터 불러오기 (Read)
+        // ==========================================
+        async function fetchPosts() {
+            const indexGrid = document.getElementById('indexGrid');
+            indexGrid.innerHTML = '<div style="color:var(--text-muted); padding: 20px 0;">Loading data from Supabase...</div>';
+            
+            const { data, error } = await supabaseClient
+                .from('posts')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching posts:', error);
+                indexGrid.innerHTML = '<div style="color:red; padding: 20px 0;">데이터를 불러오는 중 오류가 발생했습니다. Table RLS 설정을 확인해주세요.</div>';
+                return;
+            }
+
+            posts = (data || []).map(post => ({
+                ...post,
+                category: post.category || [],
+                tags: post.tags || [],
+                moods: post.moods || []
+            }));
+
+            renderCards();
+
+            // 주소창에 특정 글 번호(#post-ID)가 있으면 자동으로 디테일 페이지 열기
+            if (location.hash.startsWith('#post-')) {
+                const id = Number(location.hash.replace('#post-', ''));
+                if (id) showDetail(id, true);
+            }
+        }
+
         function handleSearch() { searchQuery = document.getElementById('searchInput').value.trim().toLowerCase(); renderCards(); }
         
-        function togglePin(id, event) {
-            if(event) event.stopPropagation(); const post = posts.find(p => p.id === id);
-            if(post) { post.pinned = !post.pinned; localStorage.setItem('designArchiveAgencyV5', JSON.stringify(posts)); renderCards(); if(currentDetailId === id) updateDetailPinBtn(post.pinned); }
+        // ==========================================
+        // 4. 핀(★) 상태 변경 (Update)
+        // ==========================================
+        async function togglePin(id, event) {
+            if(event) event.stopPropagation();
+            const post = posts.find(p => p.id === id);
+            if(!post) return;
+
+            const newPinned = !post.pinned;
+            const { error } = await supabaseClient
+                .from('posts')
+                .update({ pinned: newPinned })
+                .eq('id', id);
+
+            if (error) {
+                alert('핀 상태 변경 실패: ' + error.message);
+                return;
+            }
+
+            post.pinned = newPinned;
+            renderCards();
+            if(currentDetailId === id) updateDetailPinBtn(post.pinned);
         }
+
         function updateDetailPinBtn(isPinned) { document.getElementById('detailPinBtn').innerText = isPinned ? 'Unpin' : 'Pin'; }
 
         function renderFiltersUI() {
@@ -649,16 +696,11 @@
                 `;
                 indexGrid.appendChild(card);
             });
-            localStorage.setItem('designArchiveAgencyV5', JSON.stringify(posts));
         }
 
-        // ==========================================
-        // [수정됨] 상세 페이지 이동 시 브라우저 History 주입
-        // ==========================================
         function showDetail(id, fromHistory = false) {
             currentDetailId = id; const post = posts.find(p => p.id === id); if(!post) return;
             
-            // 브라우저 주소창 및 방문 기록에 해시 추가 (사파리 뒤로 가기 활성화)
             if (!fromHistory) {
                 history.pushState({ id: id }, '', `#post-${id}`);
             }
@@ -688,22 +730,19 @@
             const platList = document.getElementById('managePlatformList'); platList.innerHTML = ''; masterPlatforms.forEach((plat, idx) => { platList.innerHTML += `<div class="manage-item"><span>${plat}</span><div><button onclick="editPlatform(${idx})">Edit</button> | <button onclick="deletePlatform(${idx})">Del</button></div></div>`; });
             const moodList = document.getElementById('manageMoodList'); moodList.innerHTML = ''; masterMoods.forEach((mood, idx) => { moodList.innerHTML += `<div class="manage-item"><span>${mood}</span><div><button onclick="editMood(${idx})">Edit</button> | <button onclick="deleteMood(${idx})">Del</button></div></div>`; });
         }
-        function saveData() { localStorage.setItem('designArchiveMultiCats', JSON.stringify(masterCategories)); localStorage.setItem('designArchiveMultiPlats', JSON.stringify(masterPlatforms)); localStorage.setItem('designArchiveMultiMoods', JSON.stringify(masterMoods)); localStorage.setItem('designArchiveAgencyV5', JSON.stringify(posts)); renderFiltersUI(); renderCards(); }
+        function saveSettingsData() { localStorage.setItem('designArchiveMultiCats', JSON.stringify(masterCategories)); localStorage.setItem('designArchiveMultiPlats', JSON.stringify(masterPlatforms)); localStorage.setItem('designArchiveMultiMoods', JSON.stringify(masterMoods)); renderFiltersUI(); renderCards(); }
         
-        function addCategory() { const v = document.getElementById('newCategoryInput').value.trim(); if(v && !masterCategories.includes(v)) { masterCategories.push(v); document.getElementById('newCategoryInput').value = ''; saveData(); renderManageLists(); } }
-        function deleteCategory(idx) { if(confirm('Delete?')) { masterCategories.splice(idx, 1); saveData(); renderManageLists(); } }
-        function editCategory(idx) { const o = masterCategories[idx]; const n = prompt('Edit:', o); if(n && n.trim() && n !== o) { masterCategories[idx] = n.trim(); posts.forEach(p => { const i = (p.category||[]).indexOf(o); if(i>-1) p.category[i] = n.trim(); }); saveData(); renderManageLists(); } }
+        function addCategory() { const v = document.getElementById('newCategoryInput').value.trim(); if(v && !masterCategories.includes(v)) { masterCategories.push(v); document.getElementById('newCategoryInput').value = ''; saveSettingsData(); renderManageLists(); } }
+        function deleteCategory(idx) { if(confirm('Delete?')) { masterCategories.splice(idx, 1); saveSettingsData(); renderManageLists(); } }
+        function editCategory(idx) { const o = masterCategories[idx]; const n = prompt('Edit:', o); if(n && n.trim() && n !== o) { masterCategories[idx] = n.trim(); saveSettingsData(); renderManageLists(); } }
         
-        function addPlatform() { const v = document.getElementById('newPlatformInput').value.trim(); if(v && !masterPlatforms.includes(v)) { masterPlatforms.push(v); document.getElementById('newPlatformInput').value = ''; saveData(); renderManageLists(); } }
-        function deletePlatform(idx) { if(confirm('Delete?')) { masterPlatforms.splice(idx, 1); saveData(); renderManageLists(); } }
-        function editPlatform(idx) { const o = masterPlatforms[idx]; const n = prompt('Edit:', o); if(n && n.trim() && n !== o) { masterPlatforms[idx] = n.trim(); posts.forEach(p => { const i = (p.tags||[]).indexOf(o); if(i>-1) p.tags[i] = n.trim(); }); saveData(); renderManageLists(); } }
+        function addPlatform() { const v = document.getElementById('newPlatformInput').value.trim(); if(v && !masterPlatforms.includes(v)) { masterPlatforms.push(v); document.getElementById('newPlatformInput').value = ''; saveSettingsData(); renderManageLists(); } }
+        function deletePlatform(idx) { if(confirm('Delete?')) { masterPlatforms.splice(idx, 1); saveSettingsData(); renderManageLists(); } }
+        function editPlatform(idx) { const o = masterPlatforms[idx]; const n = prompt('Edit:', o); if(n && n.trim() && n !== o) { masterPlatforms[idx] = n.trim(); saveSettingsData(); renderManageLists(); } }
 
-        function addMood() { const v = document.getElementById('newMoodInput').value.trim(); if(v && !masterMoods.includes(v)) { masterMoods.push(v); document.getElementById('newMoodInput').value = ''; saveData(); renderManageLists(); } }
-        function deleteMood(idx) { if(confirm('Delete?')) { masterMoods.splice(idx, 1); saveData(); renderManageLists(); } }
-        function editMood(idx) { const o = masterMoods[idx]; const n = prompt('Edit:', o); if(n && n.trim() && n !== o) { masterMoods[idx] = n.trim(); posts.forEach(p => { const i = (p.moods||[]).indexOf(o); if(i>-1) p.moods[i] = n.trim(); }); saveData(); renderManageLists(); } }
-
-        function exportData() { const dataToExport = { categories: masterCategories, platforms: masterPlatforms, moods: masterMoods, posts: posts }; const jsonStr = JSON.stringify(dataToExport, null, 2); const blob = new Blob([jsonStr], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `archive_backup_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); }
-        function importData(event) { const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const imp = JSON.parse(e.target.result); if(imp.posts && imp.categories) { if(confirm('Overwrite existing data?')) { masterCategories = imp.categories; masterPlatforms = imp.platforms || []; masterMoods = imp.moods || []; posts = imp.posts; saveData(); closeManageModal(); alert('Import complete.'); } } else alert('Invalid file.'); } catch(err) { alert('Error reading file.'); } event.target.value = ''; }; reader.readAsText(file); }
+        function addMood() { const v = document.getElementById('newMoodInput').value.trim(); if(v && !masterMoods.includes(v)) { masterMoods.push(v); document.getElementById('newMoodInput').value = ''; saveSettingsData(); renderManageLists(); } }
+        function deleteMood(idx) { if(confirm('Delete?')) { masterMoods.splice(idx, 1); saveSettingsData(); renderManageLists(); } }
+        function editMood(idx) { const o = masterMoods[idx]; const n = prompt('Edit:', o); if(n && n.trim() && n !== o) { masterMoods[idx] = n.trim(); saveSettingsData(); renderManageLists(); } }
 
         const modal = document.getElementById('postModal'); const form = document.getElementById('postForm');
         function openModal(id = null) {
@@ -728,28 +767,84 @@
             }
         }
         function closeModal() { modal.style.display = 'none'; }
-        form.addEventListener('submit', function(e) {
-            e.preventDefault(); const id = document.getElementById('postId').value;
+        
+        // ==========================================
+        // 5. 글 추가 및 수정 (Create / Update)
+        // ==========================================
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+            const id = document.getElementById('postId').value;
             const selCats = Array.from(document.getElementById('postCategory').selectedOptions).map(o => o.value);
             const selPlats = Array.from(document.getElementById('postTags').selectedOptions).map(o => o.value);
             const selMoods = Array.from(document.getElementById('postMoods').selectedOptions).map(o => o.value);
-            let isPinned = false; if(id) { const exist = posts.find(p=>p.id == id); if(exist) isPinned = exist.pinned; }
-            const newPost = { id: id ? Number(id) : Date.now(), title: document.getElementById('postTitle').value, category: selCats, tags: selPlats, moods: selMoods, thumbnail: selectedThumbnail, content: quill.root.innerHTML, pinned: isPinned };
-            if (id) { const idx = posts.findIndex(p => p.id == id); posts[idx] = newPost; } else { posts.unshift(newPost); } 
-            localStorage.setItem('designArchiveAgencyV5', JSON.stringify(posts)); closeModal(); renderCards();
-            if(document.getElementById('detailView').style.display === 'block' && currentDetailId == id) showDetail(newPost.id);
+            
+            let isPinned = false; 
+            if(id) { const exist = posts.find(p => p.id == id); if(exist) isPinned = exist.pinned; }
+            
+            const postData = {
+                title: document.getElementById('postTitle').value,
+                category: selCats,
+                tags: selPlats,
+                moods: selMoods,
+                thumbnail: selectedThumbnail,
+                content: quill.root.innerHTML,
+                pinned: isPinned
+            };
+
+            if (id) {
+                // 수정
+                const { error } = await supabaseClient
+                    .from('posts')
+                    .update(postData)
+                    .eq('id', id);
+
+                if (error) {
+                    alert('수정 실패: ' + error.message);
+                    return;
+                }
+            } else {
+                // 새 글 작성
+                const { error } = await supabaseClient
+                    .from('posts')
+                    .insert([{
+                        id: Date.now(),
+                        ...postData
+                    }]);
+
+                if (error) {
+                    alert('작성 실패: ' + error.message);
+                    return;
+                }
+            }
+
+            closeModal();
+            await fetchPosts();
+            if(document.getElementById('detailView').style.display === 'block' && currentDetailId == id) showDetail(Number(id));
         });
-        function deletePost(id) { if(confirm("Delete this item?")) { posts = posts.filter(p => p.id !== id); localStorage.setItem('designArchiveAgencyV5', JSON.stringify(posts)); renderCards(); if(document.getElementById('detailView').style.display === 'block' && currentDetailId == id) restoreView(); } }
 
-        // 초기 실행
-        renderFiltersUI(); 
-        renderCards();
+        // ==========================================
+        // 6. 글 삭제 (Delete)
+        // ==========================================
+        async function deletePost(id) {
+            if(!confirm("Delete this item?")) return;
+            
+            const { error } = await supabaseClient
+                .from('posts')
+                .delete()
+                .eq('id', id);
 
-        // 페이지 진입 또는 새로고침 시 주소창 해시(#post-ID)가 있으면 자동으로 디테일 페이지 렌더링
-        if (location.hash.startsWith('#post-')) {
-            const id = Number(location.hash.replace('#post-', ''));
-            if (id) showDetail(id, true);
+            if (error) {
+                alert('삭제 실패: ' + error.message);
+                return;
+            }
+
+            await fetchPosts();
+            if(document.getElementById('detailView').style.display === 'block' && currentDetailId == id) restoreView();
         }
+
+        // 초기 실행: 필터 세팅 후 Supabase 데이터 로드
+        renderFiltersUI();
+        fetchPosts();
     </script>
 </body>
 </html>
