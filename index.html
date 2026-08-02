@@ -78,16 +78,17 @@
         .filter-section {
             margin-bottom: 40px;
         }
-        .directory-filters { display: flex; gap: 40px; margin-bottom: 20px; font-size: 13px; color: var(--text-muted); }
-        .filter-group { display: flex; flex-direction: column; gap: 8px; }
-        .filter-title { font-weight: 600; color: var(--text-main); margin-bottom: 8px; text-transform: uppercase;}
+        /* 🔥 컬럼 간격(gap)을 40px -> 80px로, 최소 너비(min-width)를 120px -> 180px로 넓힘 */
+        .directory-filters { display: flex; gap: 80px; margin-bottom: 30px; font-size: 14px; color: var(--text-muted); }
+        .filter-group { display: flex; flex-direction: column; gap: 10px; min-width: 180px; }
+        .filter-title { font-weight: 600; color: var(--text-main); margin-bottom: 12px; text-transform: uppercase;}
         .filter-item { cursor: pointer; transition: color 0.2s; }
         .filter-item:hover, .filter-item.active { color: var(--text-main); }
 
-        /* 🔥 내가 선택한 필터(Active Filters)가 보이는 영역 */
+        /* 내가 선택한 필터(Active Filters)가 보이는 영역 */
         .active-filters-area {
             display: flex; gap: 10px; flex-wrap: wrap; 
-            min-height: 30px; /* 선택된 게 없어도 레이아웃 유지 */
+            min-height: 30px;
         }
         .active-filter-tag {
             background-color: var(--text-main);
@@ -539,8 +540,8 @@
         // ----------------------------------------------------
         // [데이터 연동 및 다중 선택 렌더링 로직]
         // ----------------------------------------------------
-        // 💡 여기에 캡처 이미지의 카테고리들을 모두 기본값으로 추가했습니다!
-        let masterCategories = JSON.parse(localStorage.getItem('designArchiveMultiCats')) || [
+        // 🔥 과거 데이터를 무시하고 새 목록을 강제하기 위해 로컬 스토리지 Key 이름을 'V2'로 변경했습니다!
+        let masterCategories = JSON.parse(localStorage.getItem('designArchiveMultiCatsV2')) || [
             "3D", "Books & Publication", "Fashion", "Music", "Resource", "Welcome", "Copywriting", "Font", "Newsletter", 
             "Service", "Wellness", "Video", "E-Commerce", "Food & Beverage", "Non-Profit", "Software", "Agency", 
             "Educational", "Furniture", "Photography", "Studio", "Architecture", "Email", "Informative", "Portfolio", 
@@ -549,8 +550,8 @@
             "Marketing & Branding", "Report", "Web Design & Development", "etc"
         ];
         
-        let masterPlatforms = JSON.parse(localStorage.getItem('designArchiveMultiPlats')) || ["Photoshop", "Illustrator", "AI", "Wed", "Reference"];
-        let masterMoods = JSON.parse(localStorage.getItem('designArchiveMultiMoods')) || ["귀여운", "심플한", "시크"];
+        let masterPlatforms = JSON.parse(localStorage.getItem('designArchiveMultiPlatsV2')) || ["Photoshop", "Illustrator", "AI", "Wed", "Reference"];
+        let masterMoods = JSON.parse(localStorage.getItem('designArchiveMultiMoodsV2')) || ["귀여운", "심플한", "시크"];
         
         let posts = [];
         
@@ -808,7 +809,7 @@
             const platList = document.getElementById('managePlatformList'); platList.innerHTML = ''; masterPlatforms.forEach((plat, idx) => { platList.innerHTML += `<div class="manage-item"><span>${plat}</span><div><button onclick="editPlatform(${idx})">Edit</button> | <button onclick="deletePlatform(${idx})">Del</button></div></div>`; });
             const moodList = document.getElementById('manageMoodList'); moodList.innerHTML = ''; masterMoods.forEach((mood, idx) => { moodList.innerHTML += `<div class="manage-item"><span>${mood}</span><div><button onclick="editMood(${idx})">Edit</button> | <button onclick="deleteMood(${idx})">Del</button></div></div>`; });
         }
-        function saveSettingsData() { localStorage.setItem('designArchiveMultiCats', JSON.stringify(masterCategories)); localStorage.setItem('designArchiveMultiPlats', JSON.stringify(masterPlatforms)); localStorage.setItem('designArchiveMultiMoods', JSON.stringify(masterMoods)); renderFiltersUI(); renderCards(); }
+        function saveSettingsData() { localStorage.setItem('designArchiveMultiCatsV2', JSON.stringify(masterCategories)); localStorage.setItem('designArchiveMultiPlatsV2', JSON.stringify(masterPlatforms)); localStorage.setItem('designArchiveMultiMoodsV2', JSON.stringify(masterMoods)); renderFiltersUI(); renderCards(); }
         
         function addCategory() { const v = document.getElementById('newCategoryInput').value.trim(); if(v && !masterCategories.includes(v)) { masterCategories.push(v); document.getElementById('newCategoryInput').value = ''; saveSettingsData(); renderManageLists(); } }
         function deleteCategory(idx) { if(confirm('Delete?')) { masterCategories.splice(idx, 1); saveSettingsData(); renderManageLists(); } }
