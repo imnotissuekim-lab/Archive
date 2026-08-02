@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Design Archive - Index & Board (Active Filters)</title>
+    <title>Design Archive - Index</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     
@@ -54,13 +54,6 @@
         }
         .logo-area h1 { font-size: 32px; font-weight: 600; letter-spacing: -1px; cursor: pointer; text-transform: uppercase; margin: 0; line-height: 1;}
         
-        .nav-center {
-            position: absolute; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 40px; font-size: 14px; font-weight: 500; text-transform: uppercase;
-        }
-        .nav-center span { cursor: pointer; color: var(--text-muted); transition: color 0.2s; }
-        .nav-center span:hover, .nav-center span.active { color: var(--text-main); }
-
         .header-actions { display: flex; gap: 20px; align-items: center; font-size: 14px; text-transform: uppercase; font-weight: 500;}
         .header-actions span { cursor: pointer; transition: opacity 0.2s; }
         .header-actions span:hover { opacity: 0.6; }
@@ -73,22 +66,21 @@
         .search-box input:focus { width: 200px; border-color: var(--text-main); }
 
         /* =========================================
-           필터 영역 (Index & Board 공통)
+           필터 영역
            ========================================= */
         .filter-section {
             margin-bottom: 40px;
         }
-        /* 🔥 컬럼 간격(gap)을 40px -> 80px로, 최소 너비(min-width)를 120px -> 180px로 넓힘 */
         .directory-filters { display: flex; gap: 80px; margin-bottom: 30px; font-size: 14px; color: var(--text-muted); }
         .filter-group { display: flex; flex-direction: column; gap: 10px; min-width: 180px; }
         .filter-title { font-weight: 600; color: var(--text-main); margin-bottom: 12px; text-transform: uppercase;}
         .filter-item { cursor: pointer; transition: color 0.2s; }
         .filter-item:hover, .filter-item.active { color: var(--text-main); }
 
-        /* 내가 선택한 필터(Active Filters)가 보이는 영역 */
+        /* 선택한 필터 표시 영역 */
         .active-filters-area {
             display: flex; gap: 10px; flex-wrap: wrap; 
-            min-height: 30px;
+            min-height: 30px; 
         }
         .active-filter-tag {
             background-color: var(--text-main);
@@ -120,7 +112,7 @@
         }
 
         /* =========================================
-           1. Index View (기본 화면 - 카드 뷰)
+           Index View (카드 그리드)
            ========================================= */
         #indexView { display: block; flex: 1; }
         
@@ -146,30 +138,8 @@
         .action-btn:hover { color: var(--bg-color); background: var(--text-main); border-color: var(--text-main);}
 
         /* =========================================
-           2. Board View (대형 이미지 뷰)
+           Detail View
            ========================================= */
-        #boardView { display: none; flex: 1; }
-        
-        .feed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px 40px; }
-        .feed-card { cursor: pointer; display: flex; flex-direction: column; }
-        
-        .feed-image { width: 100%; aspect-ratio: 4 / 3; background: var(--border-color); overflow: hidden; position: relative;}
-        .feed-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-        .feed-card:hover .feed-image img { transform: scale(1.03); }
-
-        .feed-caption {
-            display: grid; grid-template-columns: 3fr 1.5fr 2fr 1fr; gap: 10px;
-            margin-top: 16px; font-size: 13px; line-height: 1.4; color: var(--text-main);
-            opacity: 0; transform: translateY(-10px); transition: all 0.3s ease;
-        }
-        .feed-card:hover .feed-caption { opacity: 1; transform: translateY(0); }
-        
-        .fc-title { font-weight: 600; }
-        .fc-cat { color: var(--text-muted); }
-        .fc-tags { color: var(--text-muted); }
-        .fc-year { text-align: right; color: var(--text-muted); }
-
-        /* --- Detail View --- */
         #detailView { display: none; flex: 1; max-width: 1000px; width: 100%; margin: 0 auto; padding-bottom: 60px; }
         .detail-top-bar { display: flex; justify-content: space-between; margin-bottom: 60px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; text-transform: uppercase; font-size: 13px;}
         .back-link { cursor: pointer; color: var(--text-muted); transition: 0.2s; }
@@ -256,12 +226,6 @@
         <div class="logo-area">
             <h1 onclick="resetFilters()">Archive.</h1>
         </div>
-        
-        <!-- 중앙 네비게이션 -->
-        <div class="nav-center">
-            <span id="navIndex" class="active" onclick="switchView('index')">Index</span>
-            <span id="navBoard" onclick="switchView('board')">Board</span>
-        </div>
 
         <div class="header-actions">
             <div class="search-box">
@@ -305,14 +269,7 @@
         <div class="archive-grid" id="indexGrid"></div>
     </div>
 
-    <!-- =====================================
-         2. Board View (대형 이미지 뷰)
-         ===================================== -->
-    <div id="boardView">
-        <div class="feed-grid" id="feedGrid"></div>
-    </div>
-
-    <!-- 3. 디테일 뷰 -->
+    <!-- 2. 디테일 뷰 -->
     <div id="detailView">
         <div class="detail-top-bar">
             <span class="back-link" onclick="restoreView()">← Back</span>
@@ -343,10 +300,10 @@
         <div class="blog-content" id="detailContent"></div>
     </div>
 
-    <!-- 4. 글쓰기/수정 모달 -->
+    <!-- 글쓰기/수정 모달 -->
     <div class="modal-overlay" id="postModal">
         <div class="modal-content">
-            <h3 id="modalTitle">Add to Board</h3>
+            <h3 id="modalTitle">Add Item</h3>
             <form id="postForm">
                 <input type="hidden" id="postId">
                 <div class="form-group">
@@ -393,7 +350,7 @@
         </div>
     </div>
 
-    <!-- 5. 설정 (관리/백업) 모달 -->
+    <!-- 설정 (관리/백업) 모달 -->
     <div class="modal-overlay" id="manageModal">
         <div class="modal-content small">
             <h3>Settings</h3>
@@ -445,35 +402,28 @@
         }
 
         // ----------------------------------------------------
-        // [뷰 전환 로직 (Index <-> Board)]
+        // [뷰 전환 로직 및 History API 연동]
         // ----------------------------------------------------
-        let currentViewMode = 'index'; // 기본값을 index로 설정
-
-        function switchView(mode) {
-            currentViewMode = mode;
-            document.getElementById('navIndex').classList.toggle('active', mode === 'index');
-            document.getElementById('navBoard').classList.toggle('active', mode === 'board');
-            
-            if(mode === 'index') {
-                document.getElementById('indexView').style.display = 'block';
-                document.getElementById('boardView').style.display = 'none';
-                document.getElementById('detailView').style.display = 'none';
-                document.getElementById('filterSection').style.display = 'block'; 
-            } else {
-                document.getElementById('indexView').style.display = 'none';
-                document.getElementById('boardView').style.display = 'block';
-                document.getElementById('detailView').style.display = 'none';
-                document.getElementById('filterSection').style.display = 'block'; 
-            }
-            renderCards(); 
-        }
-
-        function restoreView() {
+        function restoreView(fromHistory = false) {
             document.getElementById('detailView').style.display = 'none';
             document.getElementById('filterSection').style.display = 'block';
-            if(currentViewMode === 'index') document.getElementById('indexView').style.display = 'block';
-            else document.getElementById('boardView').style.display = 'block';
+            document.getElementById('indexView').style.display = 'block';
+            
+            if (!fromHistory && location.hash.startsWith('#post-')) {
+                history.back();
+            }
         }
+
+        window.addEventListener('popstate', () => {
+            if (location.hash.startsWith('#post-')) {
+                const id = Number(location.hash.replace('#post-', ''));
+                if (id) {
+                    showDetail(id, true);
+                    return;
+                }
+            }
+            restoreView(true);
+        });
 
         // ----------------------------------------------------
         // [에디터 초기화]
@@ -540,7 +490,6 @@
         // ----------------------------------------------------
         // [데이터 연동 및 다중 선택 렌더링 로직]
         // ----------------------------------------------------
-        // 🔥 과거 데이터를 무시하고 새 목록을 강제하기 위해 로컬 스토리지 Key 이름을 'V2'로 변경했습니다!
         let masterCategories = JSON.parse(localStorage.getItem('designArchiveMultiCatsV2')) || [
             "3D", "Books & Publication", "Fashion", "Music", "Resource", "Welcome", "Copywriting", "Font", "Newsletter", 
             "Service", "Wellness", "Video", "E-Commerce", "Food & Beverage", "Non-Profit", "Software", "Agency", 
@@ -699,9 +648,8 @@
         
         // --- 카드 렌더링 ---
         function renderCards() {
-            const feedGrid = document.getElementById('feedGrid');
             const indexGrid = document.getElementById('indexGrid');
-            feedGrid.innerHTML = ''; indexGrid.innerHTML = '';
+            indexGrid.innerHTML = '';
             
             let filtered = posts.filter(post => {
                 const cats = post.category || []; const tags = post.tags || []; const moods = post.moods || [];
@@ -723,12 +671,9 @@
             });
 
             if(filtered.length === 0) { 
-                feedGrid.innerHTML = `<div style="color:var(--text-muted);">No items found.</div>`; 
                 indexGrid.innerHTML = `<div style="color:var(--text-muted); padding: 20px 0;">No items found.</div>`; 
                 return; 
             }
-            
-            const currentYear = new Date().getFullYear();
 
             filtered.forEach(post => {
                 const cats = (post.category||[]).join(', ');
@@ -736,42 +681,22 @@
                 const bg = post.thumbnail ? post.thumbnail : '';
                 const pinMark = post.pinned ? '★' : '☆';
                 
-                // 1. Board View (Feed - 대형 이미지 뷰)
-                if(currentViewMode === 'board') {
-                    const card = document.createElement('div');
-                    card.className = 'feed-card';
-                    card.onclick = () => showDetail(post.id);
-                    card.innerHTML = `
-                        <div class="feed-image"><img src="${bg}" alt="cover"></div>
-                        <div class="feed-caption">
-                            <div class="fc-title">${post.title}</div>
-                            <div class="fc-cat">${cats}</div>
-                            <div class="fc-tags">${tagsAndMoods}</div>
-                            <div class="fc-year">${currentYear}</div>
-                        </div>
-                    `;
-                    feedGrid.appendChild(card);
-                }
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => showDetail(post.id);
                 
-                // 2. Index View (기본 뷰 - 카드 그리드)
-                if(currentViewMode === 'index') {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.onclick = () => showDetail(post.id);
-                    
-                    card.innerHTML = `
-                        <div class="card-image" style="background-image: url('${bg}')">
-                            <div class="pin-icon" onclick="togglePin(${post.id}, event)" title="Pin">${pinMark}</div>
-                            <div class="card-actions">
-                                <button class="action-btn" onclick="event.stopPropagation(); openModal(${post.id})">Edit</button>
-                                <button class="action-btn" onclick="event.stopPropagation(); deletePost(${post.id})">Del</button>
-                            </div>
+                card.innerHTML = `
+                    <div class="card-image" style="background-image: url('${bg}')">
+                        <div class="pin-icon" onclick="togglePin(${post.id}, event)" title="Pin">${pinMark}</div>
+                        <div class="card-actions">
+                            <button class="action-btn" onclick="event.stopPropagation(); openModal(${post.id})">Edit</button>
+                            <button class="action-btn" onclick="event.stopPropagation(); deletePost(${post.id})">Del</button>
                         </div>
-                        <div class="card-tags">${cats ? cats + ' / ' : ''}${tagsAndMoods}</div>
-                        <div class="card-title">${post.title}</div>
-                    `;
-                    indexGrid.appendChild(card);
-                }
+                    </div>
+                    <div class="card-tags">${cats ? cats + ' / ' : ''}${tagsAndMoods}</div>
+                    <div class="card-title">${post.title}</div>
+                `;
+                indexGrid.appendChild(card);
             });
         }
 
@@ -795,7 +720,6 @@
             document.getElementById('detailDeleteBtn').onclick = () => deletePost(id);
             
             document.getElementById('filterSection').style.display = 'none'; // 디테일 진입 시 필터 가리기
-            document.getElementById('boardView').style.display = 'none'; 
             document.getElementById('indexView').style.display = 'none'; 
             document.getElementById('detailView').style.display = 'block'; 
             window.scrollTo(0, 0);
@@ -813,15 +737,15 @@
         
         function addCategory() { const v = document.getElementById('newCategoryInput').value.trim(); if(v && !masterCategories.includes(v)) { masterCategories.push(v); document.getElementById('newCategoryInput').value = ''; saveSettingsData(); renderManageLists(); } }
         function deleteCategory(idx) { if(confirm('Delete?')) { masterCategories.splice(idx, 1); saveSettingsData(); renderManageLists(); } }
-        function editCategory(idx) { const o = masterCategories[idx]; const n = prompt('Edit:', o); if(n && n.trim() && n !== o) { masterCategories[idx] = n.trim(); saveSettingsData(); renderManageLists(); } }
+        function editCategory(idx) { const o = masterCategories[idx]; const n = prompt('Edit:', o); if(n && n.trim() && n !== o) { masterCategories[idx] = n.trim(); posts.forEach(p => { const i = (p.category||[]).indexOf(o); if(i>-1) p.category[i] = n.trim(); }); saveSettingsData(); renderManageLists(); } }
         
         function addPlatform() { const v = document.getElementById('newPlatformInput').value.trim(); if(v && !masterPlatforms.includes(v)) { masterPlatforms.push(v); document.getElementById('newPlatformInput').value = ''; saveSettingsData(); renderManageLists(); } }
         function deletePlatform(idx) { if(confirm('Delete?')) { masterPlatforms.splice(idx, 1); saveSettingsData(); renderManageLists(); } }
-        function editPlatform(idx) { const o = masterPlatforms[idx]; const n = prompt('Edit:', o); if(n && n.trim() && n !== o) { masterPlatforms[idx] = n.trim(); saveSettingsData(); renderManageLists(); } }
+        function editPlatform(idx) { const o = masterPlatforms[idx]; const n = prompt('Edit:', o); if(n && n.trim() && n !== o) { masterPlatforms[idx] = n.trim(); posts.forEach(p => { const i = (p.tags||[]).indexOf(o); if(i>-1) p.tags[i] = n.trim(); }); saveSettingsData(); renderManageLists(); } }
 
         function addMood() { const v = document.getElementById('newMoodInput').value.trim(); if(v && !masterMoods.includes(v)) { masterMoods.push(v); document.getElementById('newMoodInput').value = ''; saveSettingsData(); renderManageLists(); } }
         function deleteMood(idx) { if(confirm('Delete?')) { masterMoods.splice(idx, 1); saveSettingsData(); renderManageLists(); } }
-        function editMood(idx) { const o = masterMoods[idx]; const n = prompt('Edit:', o); if(n && n.trim() && n !== o) { masterMoods[idx] = n.trim(); saveSettingsData(); renderManageLists(); } }
+        function editMood(idx) { const o = masterMoods[idx]; const n = prompt('Edit:', o); if(n && n.trim() && n !== o) { masterMoods[idx] = n.trim(); posts.forEach(p => { const i = (p.moods||[]).indexOf(o); if(i>-1) p.moods[i] = n.trim(); }); saveSettingsData(); renderManageLists(); } }
 
         // --- 글쓰기/수정 모달 ---
         const modal = document.getElementById('postModal'); const form = document.getElementById('postForm');
@@ -834,14 +758,14 @@
             masterMoods.forEach(m => { const o = document.createElement('option'); o.value = m; o.innerText = m; moodSel.appendChild(o); });
             
             if (id) {
-                document.getElementById('modalTitle').innerText = 'Edit Board Item'; const post = posts.find(p => p.id === id);
+                document.getElementById('modalTitle').innerText = 'Edit Item'; const post = posts.find(p => p.id === id);
                 document.getElementById('postId').value = post.id; document.getElementById('postTitle').value = post.title; selectedThumbnail = post.thumbnail || "";
                 const cats = post.category || []; Array.from(catSel.options).forEach(o => o.selected = cats.includes(o.value));
                 const tags = post.tags || []; Array.from(platSel.options).forEach(o => o.selected = tags.includes(o.value));
                 const moods = post.moods || []; Array.from(moodSel.options).forEach(o => o.selected = moods.includes(o.value));
                 quill.root.innerHTML = post.content || ""; updateThumbnailPicker();
             } else {
-                document.getElementById('modalTitle').innerText = 'Add to Board'; form.reset(); document.getElementById('postId').value = ''; selectedThumbnail = "";
+                document.getElementById('modalTitle').innerText = 'Add Item'; form.reset(); document.getElementById('postId').value = ''; selectedThumbnail = "";
                 Array.from(catSel.options).forEach(o => o.selected = false); Array.from(platSel.options).forEach(o => o.selected = false); Array.from(moodSel.options).forEach(o => o.selected = false);
                 quill.root.innerHTML = ""; updateThumbnailPicker();
             }
